@@ -3,21 +3,34 @@ import { Field, reduxForm } from 'redux-form';
 
 class PostsNew extends Component {
   renderField(field) {
+    const { meta: { touched, error } } = field;
+    const className = `form-group ${touched && error ? 'has-danger' : ''}`
+
     return (
-      <div className="form-group">
+      <div className={className}>
         <label>{field.label}</label>
         <input className="form-control"
           type="text"
           {...field.input}
         />
-        {field.meta.error}
+        <div className="text-help">
+          {touched ? error : ''}
+        </div>
       </div>
     );
   }
 
+  onSubmit(values) {
+    // this === our component
+    // so since it gets calle async by handleSubmit we bind it to 'this' to make sure the 'this'
+    // we mean is not lost
+    console.log(values);
+  }
+
   render() {
+    const { handleSubmit } = this.props;
     return (
-      <form>
+      <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
         <Field
           label="Title"
           name="title"
@@ -33,6 +46,7 @@ class PostsNew extends Component {
           name="content"
           component={this.renderField}
         />
+        <button type="submit" className="bth btn-primary">Submit</button>
       </form>
     );
   }
@@ -66,6 +80,11 @@ export default reduxForm({
 
 // reduxForm is a function, very similar to the connect helper from react-redux
 // reduxForm helps us communicate with that redux form reducer we wired in in index.js in the reducers folder
+// it also comes with a bunch of inbuilt properties that are passed to our component
+// e.g. handleSubmit has been passed to the PostsNew component on behalf of reduxForm
+// handleSubmit does the redux-form side of things hwich to check check that the form is valid
+// before submitting, whereas onSubmit is a funciton we've defined and tod handleSubmit to call
+// if all looks good with the form
 
 // component prop of Form tells us what jsx to provide to the user. Put a function in there for Field
 // component to call later on when needed.

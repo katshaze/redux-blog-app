@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { createPost } from '../actions';
 
 class PostsNew extends Component {
   renderField(field) {
@@ -24,7 +27,11 @@ class PostsNew extends Component {
     // this === our component
     // so since it gets calle async by handleSubmit we bind it to 'this' to make sure the 'this'
     // we mean is not lost
-    console.log(values);
+    // console.log(values);
+
+    this.props.createPost(values, () => {
+      this.props.history.push('/');
+    });
   }
 
   render() {
@@ -46,7 +53,8 @@ class PostsNew extends Component {
           name="content"
           component={this.renderField}
         />
-        <button type="submit" className="bth btn-primary">Submit</button>
+        <button type="submit" className="btn btn-primary">Submit</button>
+        <Link to="/" className="btn btn-danger">Cancel</Link>
       </form>
     );
   }
@@ -73,7 +81,9 @@ function validate(values) {
 export default reduxForm({
   validate,
   form: 'PostsNewForm'
-})(PostsNew);
+})(
+  connect(null, { createPost })(PostsNew)
+);
 // instead of matchStateToProps and matchDispatchToProps going in here as two arguments, we give one function,
 // that takes a number of configuration options
 // i.e. the form property, which is the name of the form, that takes a unique string for the relevant form
@@ -98,3 +108,6 @@ export default reduxForm({
 
 // redux-form has validation in-built. the function will be called as soon as the user tries to
 // submit the form.
+
+// once we also bring in connect from react-redux (in order to connect to our action of creating a
+// new post), we have two helpers. so need to wire them up together
